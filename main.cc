@@ -8,6 +8,7 @@ std::random_device rd;
 std::mt19937 gen(rd());
 static constexpr double PI = 3.141592653;
 
+// What need to do in order to emplace this again?
 struct V2 {
   double x = 0;
   double y = 0;
@@ -37,29 +38,31 @@ std::vector<V2> genInitialPositions() {
   for (int i = 0; i < 300; ++i) {
     double r = radius_dis(gen);
     double a = angle_dis(gen);
-    positions.emplace(r * std::cos(a), r * std::sin(a));
+    positions.push_back(V2{r * std::cos(a), r * std::sin(a)});
   }
   return positions;
 }
 
-V2 pix2pic(const int i, const int width) {
-  double x = (i - ((width - 1) / 2)) * (1 / 127) + (100 / width);
-  return x;
+double pix2pic(const int i, const int width) {
+  const double p = 1.0 - (1.0 / width);
+  const double a = (width - 1) / 2.0;  
+  return (100.0 / a) * p * (i - a);
 }
 
 int main() {
   // Initial conditions
-  auto positions = genInitialPositions();
-  std::vector<Particle> particles = std::transform(positions.cbegin(),
-                                                   positions.cend(),
-                                                   std::back_inserter(positions),
-                                                   [](const V2 position) {
-                                                     return Particle{
-                                                       .state = Intact{},
-                                                       .position = position,
-                                                       .speed_r = 0,
-                                                     };
-                                                   });
+  std::vector<V2> positions = genInitialPositions();
+  std::vector<Particle> particles;
+  std::transform(positions.cbegin(),                 
+                 positions.cend(),
+                 std::back_inserter(particles),
+                 [](const V2& position) {
+                   return Particle{
+                     .state = Intact{},
+                     .position = position,
+                     .speed_r = 0,
+                   };
+                 });
   
   // Render function
   const int width = 255;
@@ -75,7 +78,7 @@ int main() {
       double y = pix2pic(j, width);
       
       bool in_particle = false;
-      for (const auto p : particles) {
+      for (const auto& p : particles) {
         if (pow(x - p.position.x, 2) + pow(y - p.position.y, 2) < 1) {
           in_particle = true;
           break;
