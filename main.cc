@@ -7,6 +7,7 @@
 std::random_device rd;
 std::mt19937 gen(rd());
 static constexpr double PI = 3.141592653;
+static constexpr double P_SIZE = 1.0;
 
 // What need to do in order to emplace this again?
 struct V2 {
@@ -27,15 +28,42 @@ struct Particle {
   double speed_r = 0;
 };
 
+// Might want to use HSL instead? Look into it.
+struct HSV {
+  double hue = 0;
+  double sat = 0;
+  double val = 0;
+};
+
+HSV blackbody(const double temp) {
+  // Implement.
+  return {};
+}
+
+HSV getColor(const double x, const double y, const Particle particle) {
+  // Make a macro/template for squaring functions, pow is slow
+  const double r_sq = (x - particle.position.x) * (x - particle.position.x)
+    + (y - particle.position.y) * (y - particle.position.y);
+  if (std::holds_alternative<Intact>(particle.state)) {
+    if (r_sq < P_SIZE) {
+      return HSV{};
+    }
+    return;
+  }
+  // Particle is combusting.
+  // Buuut, the color depends on the temperature which depends on all of the particles' energy...
+}
+
 std::vector<V2> genInitialPositions() {
   // Fictional coordinate system has (0,0) at the center,
-  // and stretches to 100 in each direction (so goes from -100 to 100 in u, same in v).
-  double r_upper = 1.5;
+  // and stretches to 100 in each direction (so goes from -100 to 100 in x, same in y).
+  // const double r_upper = 1.5;
+  const double r_upper = 50;
   std::uniform_real_distribution<> radius_dis(0, r_upper);
   std::uniform_real_distribution<> angle_dis(0, 2*PI);
   
   std::vector<V2> positions;
-  for (int i = 0; i < 300; ++i) {
+  for (int i = 0; i < 10; ++i) {
     double r = radius_dis(gen);
     double a = angle_dis(gen);
     positions.push_back(V2{r * std::cos(a), r * std::sin(a)});
@@ -65,6 +93,7 @@ int main() {
                  });
   
   // Render function
+  // Can parallelize this eventually.
   const int width = 255;
   const int height = 255;
 
@@ -85,9 +114,9 @@ int main() {
         }
       }
       
-      int ir = in_particle ? 255 : 10;
-      int ig = in_particle ? 255 : 10;
-      int ib = in_particle ? 255 : 10;
+      int ir = in_particle ? 255 : 20;
+      int ig = in_particle ? 255 : 20;
+      int ib = in_particle ? 255 : 20;
       
       // auto r = double(i) / (width - 1);
       // auto g = 0.25;
