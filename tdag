@@ -1,0 +1,14 @@
+(Get blackbody color from temperature value)
+
+(Convert HSV or HSL to RGB)
+
+(Implement time evolution/stepping of particles
+  (Also use FMM to get the temp, which depends on all other particles)  
+  )
+
+(Make a macro/template for squaring functions. pow will be slow)
+
+(Implement fast function pixel -> color
+  (Use FMM (Fast Multipole Method) to calculate the contribution from each particle)
+  )
+
