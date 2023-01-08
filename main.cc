@@ -51,7 +51,7 @@ HSV getColor(const double x, const double y, const Particle particle) {
     return;
   }
   // Particle is combusting.
-  // Buuut, the color depends on the temperature which depends on all of the particles' energy...
+  // Buuut, the color depends on the temperature which depends on all of the particles' energy.
 }
 
 std::vector<V2> genInitialPositions() {
