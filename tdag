@@ -10,11 +10,9 @@
 
 (Implement fast function pixel -> color
   (Use FMM (Fast Multipole Method) to calculate the contribution from each particle)
-  (Turn it into a library)
   )
 
 
 (Consider "negative" charges/energies?)
 
 
-(Room for incorporating AD in here?)

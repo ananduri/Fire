@@ -9,7 +9,7 @@ std::mt19937 gen(rd());
 static constexpr double PI = 3.141592653;
 static constexpr double P_SIZE = 1.0;
 
-// What need to do in order to emplace this again?
+// What need to do in order to emplace this again? Need ctor?
 struct V2 {
   double x = 0;
   double y = 0;
@@ -35,12 +35,16 @@ struct HSV {
   double val = 0;
 };
 
+// The Planck law gives the entire spectrum as a function of temperature.
+// Need a way to map temperature directly into color space.
+// Can we map from spectrum into color space?
+// Maybe spectrum to mean or peak frequency, then to color space?
 HSV blackbody(const double temp) {
   // Implement.
   return {};
 }
 
-HSV getColor(const double x, const double y, const Particle particle) {
+HSV getColor(const double x, const double y, const Particle& particle) {
   // Make a macro/template for squaring functions, pow is slow
   const double r_sq = (x - particle.position.x) * (x - particle.position.x)
     + (y - particle.position.y) * (y - particle.position.y);
