@@ -1,32 +1,15 @@
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <random>
-#include <variant>
 #include <vector>
+
+#include "particle.hh"
 
 std::random_device rd;
 std::mt19937 gen(rd());
 static constexpr double PI = 3.141592653;
 static constexpr double P_SIZE = 1.0;
-
-// What need to do in order to emplace this again? Need ctor?
-struct V2 {
-  double x = 0;
-  double y = 0;
-};
-
-struct Intact {};
-
-struct Combusting {
-  double energy = 0;
-};
-
-// Can use a std::variant for State
-struct Particle {
-  std::variant<Intact, Combusting> state;
-  V2 position;
-  double speed_r = 0;
-};
 
 // Might want to use HSL instead? Look into it.
 struct HSV {
@@ -52,11 +35,12 @@ HSV getColor(const double x, const double y, const Particle &particle) {
     if (r_sq < P_SIZE) {
       return HSV{};
     }
-    return;
+    return HSV{};
   }
   // Particle is combusting.
   // Buuut, the color depends on the temperature which depends on all of the
   // particles' energy.
+  return HSV{};
 }
 
 std::vector<V2> genInitialPositions() {
