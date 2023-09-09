@@ -12,6 +12,7 @@ cc_binary(
 cc_library(
   name = "particle",
   hdrs = ["particle.hh"],
+  srcs = ["particle.cc"],
 )
 
 cc_library(
