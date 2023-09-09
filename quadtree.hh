@@ -40,7 +40,7 @@ public:
   void add(Particle *const particle);
 
   // To be used for get_temperature
-  double get_potential(const Particle &particle);
+  double get_temperature(const V2 &location);
 
   // Update or evolve tree (as particles move).
   void update();
