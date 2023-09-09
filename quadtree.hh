@@ -3,6 +3,8 @@
 #include <vector>
 
 #include "particle.hh"
+// Should remove dep on particle lib by making this generic,
+// but putting constraints on the template type param.
 
 // Assumption:
 // - root node is over the area [0, 1] x [0, 1]
@@ -42,6 +44,9 @@ public:
 
   // Update or evolve tree (as particles move).
   void update();
+
+  // Only used for testing.
+  Node get_root() const;
 
 private:
   Node root_;

@@ -22,3 +22,14 @@ cc_library(
     ":particle",
   ]
 )
+
+cc_test(
+  name = "quadtree_test",
+  size = "small",
+  srcs = ["quadtree_test.cc"],
+  deps = [
+    ":quadtree",
+    ":particle",
+    "@com_google_googletest//:gtest_main",
+  ]
+)

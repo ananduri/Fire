@@ -1,5 +1,7 @@
 #include "quadtree.hh"
 
+QuadTree::Node QuadTree::get_root() const { return root_; }
+
 QuadTree::QuadTree(const std::vector<Particle *> &particles) {
   for (Particle *const particle : particles) {
     add(particle);
