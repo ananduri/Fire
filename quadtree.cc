@@ -49,9 +49,16 @@ void QuadTree::add(Particle *const particle) {
     } else {
       // Find child node to recurse into.
       // First, update monopole info.
-      curr->charge += 1;
-      curr->coc.x *= (curr->charge - 1) / curr->charge;
-      curr->coc.x += position.x / curr->charge + 1;
+      // But, this should only be updated if the particle is currently
+      // combusting.
+      if (std::holds_alternative<Combusting>(particle->state)) {
+        const double energy = std::get<Combusting>(particle->state).energy;
+        curr->charge += energy;
+        curr->coc.x *= (curr->charge - energy) / curr->charge;
+        curr->coc.x += energy * position.x / curr->charge;
+        curr->coc.y *= (curr->charge - energy) / curr->charge;
+        curr->coc.y += energy * position.y / curr->charge;
+      }
 
       extent /= 2.;
       if (position.y > center.y && position.x < center.x) {

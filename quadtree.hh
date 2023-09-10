@@ -35,7 +35,7 @@ public:
 
   QuadTree() = default;
 
-  QuadTree(const std::vector<Particle *> &particles);
+  explicit QuadTree(const std::vector<Particle *> &particles);
 
   void add(Particle *const particle);
 
