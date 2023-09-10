@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "particle.hh"
+#include "quadtree.hh"
 
 std::random_device rd;
 std::mt19937 gen(rd());
@@ -44,16 +45,15 @@ HSV getColor(const double x, const double y, const Particle &particle) {
 }
 
 std::vector<V2> genInitialPositions() {
-  // Fictional coordinate system has (0,0) at the center,
-  // and stretches to 100 in each direction (so goes from -100 to 100 in x, same
-  // in y). const double r_upper = 1.5;
-  const double r_upper = 50;
-  std::uniform_real_distribution<> radius_dis(0, r_upper);
+  // Fictional coordinate system has origin at the bottom left,
+  // and (1, 1) in the top right.
+  constexpr double R_UPPER = 0.5;
+  std::uniform_real_distribution<> radius_dis(0, R_UPPER);
   std::uniform_real_distribution<> angle_dis(0, 2 * PI);
 
-  // Insert particles into data structure of choice.
+  constexpr int NUM_PARTICLES = 10;
   std::vector<V2> positions;
-  for (int i = 0; i < 10; ++i) {
+  for (int i = 0; i < NUM_PARTICLES; ++i) {
     double r = radius_dis(gen);
     double a = angle_dis(gen);
     positions.push_back(V2{r * std::cos(a), r * std::sin(a)});
@@ -61,60 +61,70 @@ std::vector<V2> genInitialPositions() {
   return positions;
 }
 
+// Convert from pixel coordinates ([0..width]x[0..width])
+// to the [0,1]x[0,1] coordinate frame.
 double pix2pic(const int i, const int width) {
-  const double p = 1.0 - (1.0 / width);
-  const double a = (width - 1) / 2.0;
-  return (100.0 / a) * p * (i - a);
+  return static_cast<double>(i) / width;
 }
 
 int main() {
   // Initial conditions
   std::vector<V2> positions = genInitialPositions();
-  std::vector<Particle> particles;
+  // Insert particles into data structure of choice.
+  std::vector<Particle *> particles;
   std::transform(positions.cbegin(), positions.cend(),
                  std::back_inserter(particles), [](const V2 &position) {
-                   return Particle{
+                   return new Particle{
                        .state = Intact{},
                        .position = position,
                        .speed_r = 0,
                    };
                  });
+  QuadTree quadtree{particles};
 
-  // Render function
+  // Render.
   // Can parallelize this eventually.
-  const int width = 255;
-  const int height = 255;
+  constexpr int WIDTH = 255;
+  constexpr int HEIGHT = 255;
 
-  std::cout << "P3\n" << width << ' ' << height << "\n255\n";
+  std::cout << "P3\n" << WIDTH << ' ' << HEIGHT << "\n255\n";
 
-  for (int j = height - 1; j >= 0; --j) {
-    for (int i = 0; i < width; ++i) {
+  for (int j = HEIGHT - 1; j >= 0; --j) {
+    for (int i = 0; i < WIDTH; ++i) {
       // Get R, G, B from coords (i, j)
       // Get HSV first, then convert to RGB
-      double x = pix2pic(i, width);
-      double y = pix2pic(j, width);
+      double x = pix2pic(i, WIDTH);
+      double y = pix2pic(j, HEIGHT);
 
-      bool in_particle = false;
-      for (const auto &p : particles) {
-        if (pow(x - p.position.x, 2) + pow(y - p.position.y, 2) < 1) {
-          in_particle = true;
-          break;
-        }
-      }
+      // // Just have one extra loop outside for rendering the particles.
+      // // Or, just skip rendering the particles.
+      // // Actually, this was just for testing.
+      // bool in_particle = false;
+      // for (const auto &p : particles) {
+      //   if (pow(x - p.position.x, 2) + pow(y - p.position.y, 2) < 1) {
+      //     in_particle = true;
+      //     break;
+      //   }
+      // }
+      // int ir = in_particle ? 255 : 20;
+      // int ig = in_particle ? 255 : 20;
+      // int ib = in_particle ? 255 : 20;
 
-      int ir = in_particle ? 255 : 20;
-      int ig = in_particle ? 255 : 20;
-      int ib = in_particle ? 255 : 20;
+      auto temp = quadtree.get_temperature(V2{x, y});
 
-      // auto r = double(i) / (width - 1);
-      // auto g = 0.25;
-      // auto b = double(j) / (height - 1);
+      std::cout << temp << std::endl;
 
+      // Testing.
+      // auto r = x;
+      // auto g = 0.;
+      // auto b = 0.25;
+
+      // // Int versions.
       // int ir = static_cast<int>(r * 255.999);
       // int ig = static_cast<int>(g * 255.999);
       // int ib = static_cast<int>(b * 255.999);
 
-      std::cout << ir << ' ' << ig << ' ' << ib << '\n';
+      // std::cout << ir << ' ' << ig << ' ' << ib << '\n';
     }
   }
 }
