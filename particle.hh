@@ -2,6 +2,9 @@
 
 #include <variant>
 
+// Distance cutoff for evaluating potentials.
+constexpr double CUTOFF_M = 1e-3;
+
 // What need to do in order to emplace this again? Need ctor?
 struct V2 {
   double x = 0;

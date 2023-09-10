@@ -24,13 +24,13 @@ public:
     bool leaf = true;
 
     // Null for non-leaf nodes and leaf nodes with no particle
-    Particle *particle;
+    Particle *particle = nullptr;
 
     // Center of charge and charge (monopole info, only for non-leaf nodes)
     // Also, could re-use the Particle* and point to a Particle with only these
     // fields.
     V2 coc{};
-    int charge{};
+    double charge{};
   };
 
   QuadTree() = default;
@@ -39,7 +39,6 @@ public:
 
   void add(Particle *const particle);
 
-  // To be used for get_temperature
   double get_temperature(const V2 &location);
 
   // Update or evolve tree (as particles move).

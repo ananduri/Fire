@@ -1,4 +1,6 @@
+#include <cassert>
 #include <cmath>
+#include <iostream>
 
 #include "quadtree.hh"
 
@@ -76,24 +78,33 @@ void QuadTree::add(Particle *const particle) {
 double QuadTree::get_temperature(const V2 &location) {
   // Write this recursively for now.
   double temperature = 0.;
-  const auto f = [&](const Node *const node, V2 center, double extent,
+  const auto f = [&](const Node &node, const V2 &center, const double extent,
                      auto &&f) -> void {
-    // Is the node/square a near-field? Does it border the particle's square (at
-    // this depth)?
-    if (node->leaf) {
-      temperature += temperature_contrib(location, *node->particle);
+    // Is the node/square a near-field? I.e., does it border the particle's
+    // square (at this depth)?
+    if (node.leaf) {
+      if (!node.particle) {
+        return;
+      }
+      assert(node.particle != nullptr);
+
+      temperature += temperature_contrib(location, *node.particle);
     } else if ((std::abs(location.x - center.x) <= 1.5 * extent) &&
                (std::abs(location.y - center.y) <= 1.5 * extent)) {
-      extent /= 2.;
-      f(node->upper_left, V2{center.y + extent, center.x - extent}, extent, f);
-      f(node->upper_right, V2{center.y + extent, center.x + extent}, extent, f);
-      f(node->lower_left, V2{center.y - extent, center.x - extent}, extent, f);
-      f(node->lower_right, V2{center.y - extent, center.x + extent}, extent, f);
+      const double new_extent = extent / 2.;
+      f(*node.upper_left, V2{center.y + new_extent, center.x - new_extent},
+        new_extent, f);
+      f(*node.upper_right, V2{center.y + new_extent, center.x + new_extent},
+        new_extent, f);
+      f(*node.lower_left, V2{center.y - new_extent, center.x - new_extent},
+        new_extent, f);
+      f(*node.lower_right, V2{center.y - new_extent, center.x + new_extent},
+        new_extent, f);
     } else {
       // Could reuse the particle repr.
       Particle monopole{
-          .state = Combusting{node->charge},
-          .position = node->coc,
+          .state = Combusting{node.charge},
+          .position = node.coc,
           .speed_r = 0,
       };
       temperature += temperature_contrib(location, monopole);
@@ -101,7 +112,7 @@ double QuadTree::get_temperature(const V2 &location) {
   };
 
   // Could "unroll" the first call here.
-  f(&root_, V2{0.5, 0.5}, 0.5, f);
+  f(root_, V2{0.5, 0.5}, 0.5, f);
 
   return temperature;
 }
