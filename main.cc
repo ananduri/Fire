@@ -56,7 +56,7 @@ std::vector<V2> genInitialPositions() {
   for (int i = 0; i < NUM_PARTICLES; ++i) {
     double r = radius_dis(gen);
     double a = angle_dis(gen);
-    positions.push_back(V2{r * std::cos(a), r * std::sin(a)});
+    positions.emplace_back(r * std::cos(a), r * std::sin(a));
   }
   return positions;
 }

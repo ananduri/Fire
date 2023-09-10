@@ -5,8 +5,9 @@
 // Distance cutoff for evaluating potentials.
 constexpr double CUTOFF_M = 1e-3;
 
-// What need to do in order to emplace this again? Need ctor?
 struct V2 {
+  V2() = default;
+  V2(const double x, const double y) : x{x}, y{y} {}
   double x = 0;
   double y = 0;
 };
@@ -17,7 +18,6 @@ struct Combusting {
   double energy = 0;
 };
 
-// Can use a std::variant for State
 struct Particle {
   std::variant<Intact, Combusting> state;
   V2 position;
