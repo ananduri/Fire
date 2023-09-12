@@ -3,7 +3,7 @@
 #include <variant>
 
 // Distance cutoff for evaluating potentials.
-constexpr double CUTOFF_M = 1e-3;
+constexpr double CUTOFF_M = 1e-8;
 
 struct V2 {
   V2() = default;

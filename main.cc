@@ -45,18 +45,18 @@ HSV getColor(const double x, const double y, const Particle &particle) {
 }
 
 std::vector<V2> genInitialPositions() {
-  // Fictional coordinate system has origin at the bottom left,
+  // Fictional coordinate system has (0, 0) at the bottom left,
   // and (1, 1) in the top right.
   constexpr double R_UPPER = 0.5;
   std::uniform_real_distribution<> radius_dis(0, R_UPPER);
   std::uniform_real_distribution<> angle_dis(0, 2 * PI);
 
-  constexpr int NUM_PARTICLES = 10;
+  constexpr int NUM_PARTICLES = 100;
   std::vector<V2> positions;
   for (int i = 0; i < NUM_PARTICLES; ++i) {
     double r = radius_dis(gen);
     double a = angle_dis(gen);
-    positions.emplace_back(r * std::cos(a), r * std::sin(a));
+    positions.emplace_back(r * std::cos(a) + 0.5, r * std::sin(a) + 0.5);
   }
   return positions;
 }
@@ -70,12 +70,13 @@ double pix2pic(const int i, const int width) {
 int main() {
   // Initial conditions
   std::vector<V2> positions = genInitialPositions();
+  // std::vector<V2> positions{V2{0.5, 0.5}, V2{0.7, 0.7}, V2{0.7, 0.7}};
   // Insert particles into data structure of choice.
   std::vector<Particle *> particles;
   std::transform(positions.cbegin(), positions.cend(),
                  std::back_inserter(particles), [](const V2 &position) {
                    return new Particle{
-                       .state = Intact{},
+                       .state = Combusting{1.},
                        .position = position,
                        .speed_r = 0,
                    };
@@ -88,6 +89,8 @@ int main() {
   constexpr int HEIGHT = 255;
 
   std::cout << "P3\n" << WIDTH << ' ' << HEIGHT << "\n255\n";
+
+  std::vector<double> temps;
 
   for (int j = HEIGHT - 1; j >= 0; --j) {
     for (int i = 0; i < WIDTH; ++i) {
@@ -111,20 +114,25 @@ int main() {
       // int ib = in_particle ? 255 : 20;
 
       auto temp = quadtree.get_temperature(V2{x, y});
+      temps.push_back(temp);
 
-      std::cout << temp << std::endl;
+      // std::cerr << temp << std::endl;
 
       // Testing.
-      // auto r = x;
-      // auto g = 0.;
-      // auto b = 0.25;
+      // These vars scale from 0 to 1.
+      // auto r = temp / 10000.;
+      auto r = std::tanh(temp / 10000.);
+      auto g = 0.;
+      auto b = 0.;
 
-      // // Int versions.
-      // int ir = static_cast<int>(r * 255.999);
-      // int ig = static_cast<int>(g * 255.999);
-      // int ib = static_cast<int>(b * 255.999);
+      // Int versions.
+      int ir = static_cast<int>(r * 255.999);
+      int ig = static_cast<int>(g * 255.999);
+      int ib = static_cast<int>(b * 255.999);
 
-      // std::cout << ir << ' ' << ig << ' ' << ib << '\n';
+      std::cout << ir << ' ' << ig << ' ' << ib << '\n';
     }
   }
+  std::cerr << "max temp: " << *std::max_element(temps.cbegin(), temps.cend())
+            << std::endl;
 }
