@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <cmath>
+#include <chrono>
 #include <iostream>
 #include <random>
 #include <vector>
@@ -60,6 +61,7 @@ int main() {
 
   std::vector<double> temps;
 
+  auto const time_start_render = std::chrono::steady_clock::now();
   for (int j = HEIGHT - 1; j >= 0; --j) {
     for (int i = 0; i < WIDTH; ++i) {
       // Get R, G, B from coords (i, j)
@@ -94,6 +96,10 @@ int main() {
       std::cout << ir << ' ' << ig << ' ' << ib << '\n';
     }
   }
+  auto const time_end_render = std::chrono::steady_clock::now();
+  std::chrono::duration<double> const diff = time_end_render - time_start_render;
+  std::cerr << "time to render: " << diff.count() << '\n';
+  
   std::cerr << "max temp: " << *std::max_element(temps.cbegin(), temps.cend())
             << std::endl;
 }
