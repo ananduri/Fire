@@ -20,7 +20,7 @@ std::vector<V2> genInitialPositions() {
   std::uniform_real_distribution<> radius_dis(0, R_UPPER);
   std::uniform_real_distribution<> angle_dis(0, 2 * PI);
 
-  constexpr int NUM_PARTICLES = 100;
+  constexpr int NUM_PARTICLES = 200;
   std::vector<V2> positions;
   for (int i = 0; i < NUM_PARTICLES; ++i) {
     double r = radius_dis(gen);
@@ -36,7 +36,15 @@ double pix2pic(const int i, const int width) {
   return static_cast<double>(i) / width;
 }
 
-int main() {
+int main(int argc, char* argv[]) {
+  bool use_quadtree = true;
+  if (argc > 1) {
+    char const opt = *argv[1];
+    std::cerr << opt << '\n';
+    if (opt == 'q') use_quadtree = true;
+    else if (opt == 'n') use_quadtree = false;
+  }
+  
   // Initial conditions
   std::vector<V2> positions = genInitialPositions();
   // std::vector<V2> positions{V2{0.5, 0.5}, V2{0.7, 0.7}, V2{0.7, 0.7}};
@@ -50,6 +58,7 @@ int main() {
                        .speed_r = 0,
                    };
                  });
+  // Time this too
   QuadTree quadtree{particles};
 
   // Render.
@@ -69,14 +78,18 @@ int main() {
       double x = pix2pic(i, WIDTH);
       double y = pix2pic(j, HEIGHT);
 
-      // Macro or CLI arg for switching btw these
-      //auto temp = quadtree.get_temperature(V2{x, y});
-      
-      double temp = 0.;
-      V2 const loc{x, y};
+      double const temp = [&]() {
+                            V2 const loc{x, y};
+                            if (use_quadtree) {
+                              return quadtree.get_temperature(loc);
+                            } else {
+                              double temp = 0.;
       for (Particle* const p : particles) {
         temp += temperature_contrib(loc, *p);
       }
+      return temp;
+                            }
+                          }();
       temps.push_back(temp);
       
       // std::cerr << temp << std::endl;
