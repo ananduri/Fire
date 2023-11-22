@@ -6,8 +6,15 @@ cc_binary(
   deps = [
     ":particle",
     ":quadtree",
+    ":color",
   ],
 )
+
+cc_library(
+  name = "color",
+  hdrs = ["color.hh"],
+)
+
 
 cc_library(
   name = "particle",

@@ -16,7 +16,6 @@ void QuadTree::add(Particle *const particle) {
   Node *curr = &root_;
   V2 center{0.5, 0.5};
   double extent = 0.5;
-  // bool added = false;
   const V2 position = particle->position;
 
   // Also need to propagate updates back up through tree.
