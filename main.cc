@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <sstream>
 //#include <format>
 #include <fstream>
 #include <iostream>
@@ -55,13 +56,15 @@ void step_particles(std::vector<Particle *> &particles) {
 // Can add parellelism here.
 void render_particles(std::vector<Particle *> const &particles,
                       QuadTree const &quadtree, int const width,
-                      int const height, int const index,
-                      bool const use_quadtree) {
+                      int const height, bool const use_quadtree,
+                      int const index) {
   std::ofstream file_handle;
   // file_handle.open(std::format("output/img_{}", index));
-  //  Do I have to use the abolute path?
-  file_handle.open(
-      "/Users/drake/Documents/projects/genart/fire_cpp/output/img_0.ppm");
+  // Do I have to use the absolute path? Is it because of Bazel?
+  std::stringstream ss;
+  ss << "/Users/drake/Documents/projects/genart/fire_cpp/output/img_" << index
+     << ".ppm";
+  file_handle.open(ss.str());
   if (!file_handle.is_open()) {
     std::cout << "file not open\n";
     return;
@@ -145,5 +148,5 @@ int main(int argc, char *argv[]) {
   // Add time evolution.
   // Do it using the quadtree after adding remove() to it.
 
-  render_particles(particles, quadtree, WIDTH, HEIGHT, 0, use_quadtree);
+  render_particles(particles, quadtree, WIDTH, HEIGHT, use_quadtree, 1);
 }
