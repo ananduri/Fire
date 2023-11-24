@@ -43,6 +43,15 @@ int main(int argc, char* argv[]) {
     std::cerr << opt << '\n';
     if (opt == 'q') use_quadtree = true;
     else if (opt == 'n') use_quadtree = false;
+void step_particles(std::vector<Particle*>& particles) {
+  // Have timestep controlled via CLI flags (number & spacing)
+  for (Particle* p : particles) {
+    double const x_from_center = p->position.x - 0.5;
+    double const y_from_center = p->position.y - 0.5;
+    double const radial_dist = sqrt(x_from_center * x_from_center + y_from_center * y_from_center);
+    double const new_radial_dist = radial_dist + p->speed_r * TIMESTEP;
+    p->position.x = (new_radial_dist / radial_dist) * x_from_center + 0.5;
+    p->position.y = (new_radial_dist / radial_dist) * y_from_center + 0.5;
   }
   
   // Initial conditions
