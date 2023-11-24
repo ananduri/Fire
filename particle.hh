@@ -7,7 +7,7 @@ constexpr double CUTOFF_M = 1e-8;
 
 struct V2 {
   V2() = default;
-  V2(double const x, double const y) : x{x}, y{y} {}
+  V2(const double x, const double y) : x{x}, y{y} {}
   double x = 0.;
   double y = 0.;
 };
@@ -24,4 +24,4 @@ struct Particle {
   double speed_r = 0;
 };
 
-double temperature_contrib(V2 const& location, Particle const& particle);
+double temperature_contrib(const V2 &location, const Particle &particle);

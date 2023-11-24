@@ -81,7 +81,7 @@ void QuadTree::add(Particle *const particle) {
   }
 }
 
-double QuadTree::get_temperature(const V2 &location) {
+double QuadTree::get_temperature(const V2 &location) const {
   // Write this recursively for now.
   double temperature = 0.;
   const auto f = [&](const Node &node, const V2 &center, const double extent,

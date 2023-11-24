@@ -39,7 +39,7 @@ public:
 
   void add(Particle *const particle);
 
-  double get_temperature(const V2 &location);
+  double get_temperature(const V2 &location) const;
 
   // Update or evolve tree (as particles move).
   void update();
