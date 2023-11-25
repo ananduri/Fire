@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <cstdlib>
 #include <sstream>
 //#include <format>
 #include <fstream>
@@ -128,6 +129,7 @@ int main(int argc, char *argv[]) {
       use_quadtree = false;
   }
 
+  // Add CLI option for number of pixels as well
   constexpr int WIDTH = 255 * 2;
   constexpr int HEIGHT = 255 * 2;
 
@@ -148,5 +150,16 @@ int main(int argc, char *argv[]) {
   // Add time evolution.
   // Do it using the quadtree after adding remove() to it.
 
-  render_particles(particles, quadtree, WIDTH, HEIGHT, use_quadtree, 1);
+  for (int timestep = 0; timestep < 5; ++timestep) {
+    render_particles(particles, quadtree, WIDTH, HEIGHT, use_quadtree,
+                     timestep);
+    step_particles(particles);
+  }
+
+  // Run post-processing step to create the MP4? Or do it in CLI?
+  std::system(
+      "ffmpeg -r 10 -i "
+      "/Users/drake/Documents/projects/genart/fire_cpp/output/img_%d.ppm -c:v "
+      "libx264 -crf 25 -vf 'scale=500:500,format=yuv420p' -movflags +faststart "
+      "/Users/drake/Documents/projects/genart/fire_cpp/output/output.mp4");
 }
