@@ -158,7 +158,7 @@ int main(int argc, char *argv[]) {
 
   // Run post-processing step to create the MP4? Or do it in CLI?
   std::system(
-      "ffmpeg -r 10 -i "
+      "ffmpeg -r 20 -i -y"
       "/Users/drake/Documents/projects/genart/fire_cpp/output/img_%d.ppm -c:v "
       "libx264 -crf 25 -vf 'scale=500:500,format=yuv420p' -movflags +faststart "
       "/Users/drake/Documents/projects/genart/fire_cpp/output/output.mp4");
